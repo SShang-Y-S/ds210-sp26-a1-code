@@ -161,7 +161,7 @@ mod part2_tests {
         let mut player = Player::new(SimulatedPlayer::new(number));
         let answer = Part2::guess_the_number(&mut player, min, max);
         assert_eq!(answer, number);
-        assert!(player.steps() <= max);
+        assert!(player.steps() <=  max.ilog2()+1);
     }
 
     #[test]
@@ -174,7 +174,7 @@ mod part2_tests {
         let mut player = Player::new(SimulatedPlayer::new(number));
         let answer = Part2::guess_the_number(&mut player, min, max);
         assert_eq!(answer, number);
-        assert!(player.steps() <= max);
+        assert!(player.steps() <=  max.ilog2()+1);
     }
 
     #[test]
@@ -187,6 +187,8 @@ mod part2_tests {
         let mut player = Player::new(SimulatedPlayer::new(number));
         let answer = Part2::guess_the_number(&mut player, min, max);
         assert_eq!(answer, number);
-        assert!(player.steps() <= max);
+        assert!(player.steps() <= max.ilog2()+1);
     }
 }
+//I search in Google and used what is provided in AI Overview 
+//to figure out that in order to find the interger logrithem output I need to use ilog2()
