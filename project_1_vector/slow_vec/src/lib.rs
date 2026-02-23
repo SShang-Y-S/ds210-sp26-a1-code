@@ -64,8 +64,24 @@ impl<T> SlowVec<T> {
     }
 
     // Student 2: Provide your solution here
+
     pub fn remove(&mut self, i: usize) {
-        todo!("Student 2 should implement this");
+        let n = self.len();
+        assert!(i < n);
+
+        let mut tmp = FixedSizeArray::allocate(n - 1);
+        let mut new_j = 0;
+
+        for old_j in 0..n {
+            if old_j == i {
+                let _ = self.fixed.move_out(old_j);
+            } else {
+                tmp.put(self.fixed.move_out(old_j), new_j);
+                new_j += 1;
+            }
+        }
+
+        self.fixed = tmp;
     }
 }
 
@@ -74,5 +90,6 @@ impl<T> SlowVec<T> {
 impl<T: Display> Display for SlowVec<T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "SlowVec({})", self.fixed)
+        // you expect it to be SlowVec(Fixed[10,20,30,40])
     }
 }
