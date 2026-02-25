@@ -83,6 +83,10 @@ impl<T> FastVec<T> {
 
     // Student 1 should implement this.
     pub fn remove(&mut self, i: usize) {
+        if i < self.len() 
+        {
+            panic!("FastVec: remove out of bounds");
+        }
         todo!("implement remove");
     }
 
