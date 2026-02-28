@@ -83,11 +83,22 @@ impl<T> FastVec<T> {
 
     // Student 1 should implement this.
     pub fn remove(&mut self, i: usize) {
-        if i < self.len() 
+        // let ptr = MALLOC.malloc(self.len() * size_of::<*mut T>()) as *mut T;
+        
+        unsafe{
+            let remove_i = ptr::read(self.ptr_to_data.add(i));
+        for j in i+1..self.len(){
+            let ptr = self.ptr_to_data.add(j-1);
+            let ptr_j = self.ptr_to_data.add(j);
+            let v = ptr::read(ptr_j);
+            ptr::write(ptr,v);
+        }
+        self.len -= 1;
+    }
+     if i > self.len() 
         {
             panic!("FastVec: remove out of bounds");
         }
-        todo!("implement remove");
     }
 
     // This appears correct but with further testing, you will notice it has a bug!
