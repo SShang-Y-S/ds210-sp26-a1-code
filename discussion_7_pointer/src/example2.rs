@@ -7,7 +7,6 @@ fn big_vector(value: i32) -> *const Vec<i32> {
     for _ in 0..1000000 {
         v.push(value);
     }
-
     // Now we want to return a pointer to it to avoid copying all the elements, what could go wrong?
     let v_ptr = &v as *const Vec<i32>;
     return v_ptr;
