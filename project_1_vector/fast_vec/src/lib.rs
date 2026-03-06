@@ -106,10 +106,10 @@ impl<T> FastVec<T> {
     // Hint: check out case 2 in memory.rs, which you can run using
     //       cargo run --bin memory
     pub fn clear(&mut self) {
-        MALLOC.free(self.ptr_to_data as *mut u8);
         self.ptr_to_data = null_mut();
         self.len = 0;
         self.capacity = 0;
+        MALLOC.free(self.ptr_to_data as *mut u8);
     }
 }
 
