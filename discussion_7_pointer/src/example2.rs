@@ -15,7 +15,7 @@ fn big_vector(value: i32) -> *const Vec<i32> {
 
 fn main() {
     let my_ptr = big_vector(10);
-    let my_ptr_2 = big_vector(20);
+    let _my_ptr_2 = big_vector(20);
     unsafe {
         let element_at_0 = (&*my_ptr)[0];
         println!("{element_at_0}");
