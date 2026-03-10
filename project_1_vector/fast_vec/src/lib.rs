@@ -61,7 +61,7 @@ impl<T> FastVec<T> {
     // Student 1 and Student 2 should implement this together
     // Use the project handout as a guide for this part!
     pub fn get(&self, i: usize) -> &T {
-        if i > self.len(){
+        if i >= self.len(){
             panic!("FastVec: get out of bounds");
         }
         let ptr;
