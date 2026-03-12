@@ -25,10 +25,10 @@ impl ChatbotV1 {
         let response = user_message.await;
         let result = response.map(|msg|msg.to_string()).unwrap();
 
-        // match response.ok() {
+        // match response() {
         //     Some(msg) => msg,
         //     None => String::from("no response recieved");
-        // }
+        // } I notice the type doesn't match it's probably going to take more effor this way
 
         // return String::from("Hello, I am not a bot (yet)!");
         return result;
