@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 use std::{fmt::{Display, Formatter}, ptr::{self, null_mut}};
 
 use malloc::MALLOC;
@@ -122,3 +123,7 @@ impl<T: Display> Display for FastVec<T> {
         return write!(f, "]");
     }
 }
+=======
+// Not yet released.
+
+>>>>>>> Stashed changes
