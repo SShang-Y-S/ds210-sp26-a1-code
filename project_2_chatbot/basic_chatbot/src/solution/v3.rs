@@ -1,4 +1,5 @@
 use kalosm::language::*;
+use std::collections::HashMap;
 
 #[allow(dead_code)]
 pub struct ChatbotV3 {
@@ -8,6 +9,8 @@ pub struct ChatbotV3 {
     // together!
     // Need to store one chat session per user.
     // Think of some kind of data structure that can help you with this.
+    model: Llama,
+    chat_session: HashMap<String, Chat<Llama>>,
 }
 
 impl ChatbotV3 {
@@ -15,6 +18,8 @@ impl ChatbotV3 {
     pub fn new(model: Llama) -> ChatbotV3 {
         return ChatbotV3 {
             // Make sure you initialize your struct members here
+            model,
+            chat_session: HashMap::new(),
         };
     }
 

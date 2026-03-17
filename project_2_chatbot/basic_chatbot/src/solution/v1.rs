@@ -17,20 +17,7 @@ impl ChatbotV1 {
             .chat()
             .with_system_prompt("The assistant will act like a pirate");
 
-        // You need to add your code here
-        // You must find a way to add the given message to the chat_session!
-        // consider https://docs.rs/kalosm/0.4.0/kalosm/language/struct.Chat.html#method.add_message
-        // Hint: make sure you transform/extract the response message as a **String**.
-        let user_message = chat_session.add_message(message);
-        let response = user_message.await;
-        let result = response.map(|msg|msg.to_string()).unwrap();
-
-        // match response() {
-        //     Some(msg) => msg,
-        //     None => String::from("no response recieved");
-        // } I notice the type doesn't match it's probably going to take more effor this way
-
-        // return String::from("Hello, I am not a bot (yet)!");
-        return result;
+        let response = chat_session.add_message(message).await;
+        return response.unwrap();
     }
 }
