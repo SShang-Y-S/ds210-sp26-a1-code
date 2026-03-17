@@ -29,7 +29,17 @@ impl ChatbotV3 {
         // Notice, you are given both the `message` and also the `username`.
         // Use this information to select the correct chat session for that user and keep it
         // separated from the sessions of other users.
-        return String::from("Hello, I am not a bot (yet)!");
+        if !self.chat_session.contains_key(&username){
+            let chat_session = self
+            .model
+            .chat()
+            .with_system_prompt("This assistant will act like a pirate");
+
+            self.chat_session.insert(username.clone(), chat_session);
+        }
+        let user_session = self.chat_session.get_mut(&username).unwrap(); //must use get_mut to get an reference without making an error
+        let response = user_session.add_message(message).await; //user_session is borrowed as mutable, therefore must use get_mut
+        return response.unwrap();
     }
 
     #[allow(dead_code)]
