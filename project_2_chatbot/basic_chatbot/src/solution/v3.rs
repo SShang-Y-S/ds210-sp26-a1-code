@@ -48,7 +48,7 @@ impl ChatbotV3 {
         Some(session) => {
             session.session().expect("session error").history()
                 .iter()
-                .map(|msg: &ChatMessage| msg.to_string())
+                .map(|msg: &ChatMessage| msg.content().to_string())
                 .collect()
         }
         None => Vec::new(),
