@@ -1,6 +1,5 @@
 use kalosm::language::*;
 use crate::solution::file_library::{self, load_chat_session_from_file, save_chat_session_to_file};
-use std::collections::HashMap;
 pub struct ChatbotV4 {
     model: Llama,
 }
