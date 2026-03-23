@@ -33,6 +33,10 @@ impl<V> Cache<V> {
     // Helper functions.
     fn remove_least_recently_used(&mut self) {
         // TODO: your code goes here.
+        if self.usage_history.len() > 0{ //avoid removing empty vectors
+            let least_recent = self.usage_history.remove(0); //this gets the first in the usage_history vector, the first one is always the least recently used one according to LRU
+            self.hashmap.remove(&least_recent); //Remove from the original address because self is mutable
+        }
         // println!("Removing least recently used");
     }
     fn mark_as_most_recently_used(&mut self, username: String) {
