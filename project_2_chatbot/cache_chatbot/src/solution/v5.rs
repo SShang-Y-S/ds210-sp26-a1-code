@@ -1,5 +1,5 @@
 use kalosm::language::*;
-use file_chatbot::solution::file_library;
+use file_chatbot::solution::file_library::{self, load_chat_session_from_file};
 
 use crate::solution::Cache;
 
@@ -44,14 +44,40 @@ impl ChatbotV5 {
                 println!("get_history: {username} is not in the cache!");
                 // TODO: The cache does not have the chat. What should you do?
                 // Your code goes here.
-                return Vec::new();
+                let mut chat_session = self
+                .model
+                .chat()
+                .with_system_prompt("The assistant will act like a pirate");
+            let load_file = load_chat_session_from_file(filename);
+            match load_file{
+                None => {},
+                Some(session) => {
+                    chat_session = chat_session.with_session(session);
+                }
+            }
+                
+                let history = chat_session
+                .session()
+                .unwrap()
+                .history()
+                .iter()
+                .map(|msg: &ChatMessage| msg.content().to_string())
+                .collect();
+
+                self.cache.insert_chat(username, chat_session);
+                return history;
             }
             Some(chat_session) => {
                 println!("get_history: {username} is in the cache! Nice!");
                 // TODO: The cache has this chat. What should you do?
                 // Your code goes here.
-                return Vec::new();
-
+                return chat_session
+                .session()
+                .unwrap()
+                .history()
+                .iter()
+                .map(|msg| msg.content().to_string())
+                .collect();
             }
         }
     }
