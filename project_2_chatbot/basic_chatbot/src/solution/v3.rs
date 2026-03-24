@@ -48,6 +48,7 @@ impl ChatbotV3 {
         Some(session) => {
             session.session().expect("session error").history()
                 .iter()
+                .filter(|msg| msg.role() != MessageType::SystemPrompt)
                 .map(|msg: &ChatMessage| msg.content().to_string())
                 .collect()
         }
