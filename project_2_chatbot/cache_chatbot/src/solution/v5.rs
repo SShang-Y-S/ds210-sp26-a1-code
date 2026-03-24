@@ -44,7 +44,7 @@ impl ChatbotV5 {
                 let current_session = chat_session.session().unwrap();
                 file_library::save_chat_session_to_file(filename, &*current_session);
                 // saves the file as backup 
-                self.cache.insert_chat(username,chat_session);
+                self.cache.insert_chat(username,chat_session.clone());
                 // puts the convo into cache for next time
                 return response.to_string();
                 // returns the response for chatbot
