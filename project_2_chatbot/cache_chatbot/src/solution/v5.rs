@@ -27,7 +27,7 @@ impl ChatbotV5 {
                 let mut chat_session = self.model
                 // notes for self : this is when the user is not in cache
                     .chat()
-                    .with_system_prompt("The assistant will act like a pirate")
+                    .with_system_prompt("The assistant will act like a pirate");
                     // makes chatbot act like a pirate (ARUGH MATEY!!!)
                 let load_file = load_chat_session_from_file(filename);
                 // loads the file from their old conversation
