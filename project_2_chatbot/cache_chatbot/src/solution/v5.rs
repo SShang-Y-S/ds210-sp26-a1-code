@@ -27,7 +27,7 @@ impl ChatbotV5 {
                 let mut chat_session = self.model
                 // notes for self : this is when the user is not in cache
                     .chat()
-                    .with_system_prompt("The assistant will act like a pirate")
+                    .with_system_prompt("The assistant will act like a pirate");
                     // makes chatbot act like a pirate (ARUGH MATEY!!!)
                 let load_file = load_chat_session_from_file(filename);
                 // loads the file from their old conversation
@@ -44,7 +44,7 @@ impl ChatbotV5 {
                 let current_session = chat_session.session().unwrap();
                 file_library::save_chat_session_to_file(filename, &*current_session);
                 // saves the file as backup 
-                self.cache.insert_chat(username,chat_session);
+                self.cache.insert_chat(username,chat_session.clone());
                 // puts the convo into cache for next time
                 return response.to_string();
                 // returns the response for chatbot
