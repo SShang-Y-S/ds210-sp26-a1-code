@@ -43,8 +43,14 @@ impl ChatbotV4 {
                 return Vec::new();
             },
             Some(session) => {
-                // TODO: what should happen here?
-                return Vec::new();
+                session.history()
+                // personal notes to understand!! : gets the list of messages from loaded session
+                    .iter()
+                    // this iterates over each message
+                    .map(|msg| format!("{:?}", msg))
+                    // this converts each message into a string
+                    .collect()
+                    // this puts the strings to return
             }
         }
     }
