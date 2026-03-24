@@ -91,6 +91,7 @@ impl ChatbotV5 {
                 .unwrap()
                 .history()
                 .iter()
+                .filter(|msg| msg.role() != MessageType::SystemPrompt)
                 .map(|msg: &ChatMessage| msg.content().to_string())
                 .collect();
 
@@ -106,6 +107,7 @@ impl ChatbotV5 {
                 .unwrap()
                 .history()
                 .iter()
+                .filter(|msg| msg.role() != MessageType::SystemPrompt)
                 .map(|msg| msg.content().to_string())
                 .collect();
             }
