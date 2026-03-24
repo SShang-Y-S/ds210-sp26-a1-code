@@ -47,7 +47,9 @@ impl ChatbotV4 {
                 // personal notes to understand!! : gets the list of messages from loaded session
                     .iter()
                     // this iterates over each message
-                    .map(|msg| format!("{:?}", msg))
+                    .filter(|msg|msg.role() != MessageType::SystemPrompt)
+                    // an extra call to filter 
+                    .map(|msg| msg.content().to_string())
                     // this converts each message into a string
                     .collect()
                     // this puts the strings to return
