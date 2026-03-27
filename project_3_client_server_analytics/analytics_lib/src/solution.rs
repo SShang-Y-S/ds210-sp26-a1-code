@@ -2,8 +2,33 @@ use std::collections::HashMap;
 use crate::dataset::{ColumnType, Dataset, Value, Row};
 use crate::query::{Aggregation, Condition, Query};
 
+pub fn row_matchs(dataset: &Dataset, row: &Row, filter: &Condition) -> bool{ //made this to find all the matches
+    match filter{
+        Condition::Equal(column_name, value) =>{
+            let index = dataset.column_index(column_name);
+            row.get_value(index) == value
+        }
+        Condition::Not(condition) =>{
+            !row_matchs(dataset, row, condition)
+        }
+        Condition::And(left, right ) => {
+            row_matchs(dataset, row, left) && row_matchs(dataset, row, right)
+        }
+        Condition::Or(left, right) =>{
+            row_matchs(dataset, row, left) || row_matchs(dataset, row, right)
+        }
+    }
+}
+
 pub fn filter_dataset(dataset: &Dataset, filter: &Condition) -> Dataset {
-    todo!("Implement this!");
+    let mut filtered_dataset = Dataset::new(dataset.columns().clone());
+    for row in dataset.iter(){
+        if row_matchs(dataset, row, filter){
+            filtered_dataset.add_row(row.clone());
+        }
+    }
+
+     return filtered_dataset;
 }
 
 pub fn group_by_dataset(dataset: Dataset, group_by_column: &String) -> HashMap<Value, Dataset> {
