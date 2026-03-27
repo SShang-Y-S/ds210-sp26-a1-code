@@ -32,7 +32,25 @@ pub fn filter_dataset(dataset: &Dataset, filter: &Condition) -> Dataset {
 }
 
 pub fn group_by_dataset(dataset: Dataset, group_by_column: &String) -> HashMap<Value, Dataset> {
-    todo!("Implement this!");
+    let mut subset = HashMap::new();
+    for row in dataset.iter(){
+        let column_index = dataset.column_index(group_by_column);
+        let cell = row.get_value(column_index).clone();
+
+        let tmp = subset.get_mut(&cell);
+        match tmp{
+            None => {
+                let mut dataset = Dataset::new(dataset.columns().clone());
+                dataset.add_row(row.clone());
+                subset.insert(cell, dataset);
+            }
+            Some(new_dataset) => {
+                new_dataset.add_row(row.clone());
+            }
+        }
+        //subset.insert(cell, dataset);
+    }
+    return subset;
 }
 
 pub fn aggregate_dataset(dataset: HashMap<Value, Dataset>, aggregation: &Aggregation) -> HashMap<Value, Value> {
