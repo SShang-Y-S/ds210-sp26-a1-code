@@ -54,7 +54,42 @@ pub fn group_by_dataset(dataset: Dataset, group_by_column: &String) -> HashMap<V
 }
 
 pub fn aggregate_dataset(dataset: HashMap<Value, Dataset>, aggregation: &Aggregation) -> HashMap<Value, Value> {
-    todo!("Implement this!");
+    // we borrow aggregation (&) because we need to read it, we dont need to own or modify it
+    let mut result = HashMap::new();
+
+    for(group_value, group_dataset)in dataset{
+        //the function takes dataset without the &, meaning it owns the hashmap
+        let aggregated_value = match aggregation {
+            Aggregation::Count(_) => {
+                Value::Integer(group_dataset.len() as i32)
+
+            }
+            Aggregation::Sum(column_name) => {
+                let index = group_dataset.column_index(column_name);
+                // the scope here is the index variable 
+                let mut sum = 0;
+                for row in group_dataset.iter(){
+                    if let Value::Integer(n) = row.get_value(index){
+                        sum += n;
+                    }
+                }
+                Value::Integer(sum)
+            }
+            Aggregation::Average(column_name) => {
+                let index = group_dataset.column_index(column_name);
+                let mut sum = 0;
+                let count = group_dataset.len() as i32;
+                for row in group_dataset.iter(){
+                    if let Value::Integer(n) = row.get_value(index){
+                        sum += n;
+                    }
+                }
+                Value::Integer(sum/count)
+            }
+        };
+        result.insert(group_value, aggregated_value);
+    }
+    return result;
 }
 
 pub fn compute_query_on_dataset(dataset: &Dataset, query: &Query) -> Dataset {
