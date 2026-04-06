@@ -20,5 +20,5 @@ pub async fn run_slow_rpc(rpc_client: &RPCInterfaceClient, query: Query) -> Data
 pub async fn run_fast_rpc(rpc_client: &RPCInterfaceClient, query: Query) -> Dataset {
     println!("using fast_rpc");
 
-    rpc_client.fast_rpc(Context::current(),query).await.unwrap()
+    return rpc_client.fast_rpc(Context::current(),query).await.unwrap()
 }
