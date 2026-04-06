@@ -21,7 +21,10 @@ fn parse_value(text: &str) -> Value{
 }
 
 fn parse_condition(text: &str) -> Condition{
-    let condition = text.trim();
+    let condition = text.trim()
+    .trim_start_matches("(")
+    .trim_end_matches(")");
+
     if condition.contains(" AND "){
         let parts:Vec<&str> = condition.split(" AND ").collect();
         return Condition::And(
@@ -29,11 +32,24 @@ fn parse_condition(text: &str) -> Condition{
             Box::new(parse_condition(parts[1])),
         );
     }
-    else if condition.contains(" OR "){
+    if condition.contains(" OR "){
         let parts:Vec<&str> = condition.split(" OR ").collect();
         return Condition::Or(
             Box::new(parse_condition(parts[0])),
             Box::new(parse_condition(parts[1])),
+        );
+    }
+    if condition.contains("!("){
+        let parts:Vec<&str> = condition.split("!(").collect();
+        return Condition::Not(
+            Box::new(parse_condition(parts[1]))
+        );
+    }
+    if condition.contains(" == "){
+        let parts:Vec<&str> = condition.split(" == ").collect();
+        return Condition::Equal(
+            parts[1].to_string(), //String
+            parse_value(parts[1]), //Value
         );
     }
     let re = Regex::new(r#"^\s*([A-Za-z0-9_]+)
@@ -51,7 +67,8 @@ fn parse_query_from_string(input: String) -> Query {
         r#"^FILTER\s+(.+)\s+
         GROUP BY\s+([A-Za-z0-9_]+)\s+
         (COUNT/SUM/AVERAGE)\s+([A-Za-z0-9_]+)\s*$"#)
-        .unwrap(); //Used ChatGPT to generate this line because I was having trouble processing all the conditions
+        .unwrap(); 
+    //Used ChatGPT to generate this line because I was having trouble processing all the conditions
 
     let cap = re.captures(&input).unwrap();
 
@@ -73,6 +90,8 @@ fn parse_query_from_string(input: String) -> Query {
     else{
         aggregation = Aggregation::Average(agg_col);
     }
+
+    println!("{:?}", re.captures(&input));
 
     return Query::new(condition, group_by, aggregation);
 }
