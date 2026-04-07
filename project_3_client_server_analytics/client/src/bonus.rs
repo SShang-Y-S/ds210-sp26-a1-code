@@ -48,12 +48,11 @@ fn parse_condition(text: &str) -> Condition{
     if condition.contains(" == "){
         let parts:Vec<&str> = condition.split(" == ").collect();
         return Condition::Equal(
-            parts[1].to_string(), //String
+            parts[0].to_string(), //String
             parse_value(parts[1]), //Value
         );
     }
-    let re = Regex::new(r#"^\s*([A-Za-z0-9_]+)
-    \s*==\s*("?[^"]+"?|\d+)\s*$"#).unwrap();
+    let re = Regex::new(r#"^\s*([A-Za-z0-9_]+)\s*==\s*("?[^"]+"?|\d+)\s*$"#).unwrap();
     let cap = re.captures(condition).unwrap();
     let column = cap.get(1).unwrap().as_str().to_string();
     let val_text = cap.get(2).unwrap().as_str();
@@ -64,9 +63,7 @@ fn parse_condition(text: &str) -> Condition{
 // Your solution goes here.
 fn parse_query_from_string(input: String) -> Query {
     let re = Regex::new(
-        r#"^FILTER\s+(.+)\s+
-        GROUP BY\s+([A-Za-z0-9_]+)\s+
-        (COUNT/SUM/AVERAGE)\s+([A-Za-z0-9_]+)\s*$"#)
+        r#"^FILTER\s+(.+)\s+GROUP BY\s+([A-Za-z0-9_]+)\s+(COUNT|SUM|AVERAGE)\s+([A-Za-z0-9_]+)\s*$"#)
         .unwrap(); 
     //Used ChatGPT to generate this line because I was having trouble processing all the conditions
 
@@ -91,7 +88,6 @@ fn parse_query_from_string(input: String) -> Query {
         aggregation = Aggregation::Average(agg_col);
     }
 
-    println!("{:?}", re.captures(&input));
 
     return Query::new(condition, group_by, aggregation);
 }
