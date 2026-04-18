@@ -4,12 +4,81 @@ use std::time::Duration;
 use tic_tac_toe_stencil::agents::Agent;
 use tic_tac_toe_stencil::board::Board;
 use tic_tac_toe_stencil::player::Player;
+use tic_tac_toe_stencil::board::Cell;
+// i added this use statement to access the cell
 
 // Your solution solution.
 pub struct SolutionAgent {}
 
 fn heuristic(board: &mut Board) -> i32{
-    return board.score();
+    let cells = board.get_cells();
+    let rows = cells.len();
+    let cols = cells[0].len();
+    let mut score: i32 = 0;
+
+    // helper: this scores a single 3 cell window
+    // takes three cell values, returns the score contribution
+    let eval_window = |a: &Cell, b: &Cell, c: &Cell| -> i32 {
+        let window = [a, b, c];
+        let mut x_count = 0;
+        let mut o_count = 0;
+        let mut wall = false;
+
+        for cell in window.iter() {
+            match cell {
+                Cell::X => x_count += 1,
+                Cell::O => o_count += 1,
+                Cell::Wall => wall = true,
+                Cell::Empty => {}
+            }
+        }
+
+        // Dead window: has a wall, or has both X and O
+        if wall || (x_count > 0 && o_count > 0) {
+            return 0;
+        }
+
+        match (x_count, o_count) {
+            (3, 0) => 100,
+            (2, 0) => 10,
+            (1, 0) => 1,
+            (0, 3) => -100,
+            (0, 2) => -10,
+            (0, 1) => -1,
+            _ => 0,
+        }
+    };
+
+    // this is the horizontal windows (rows)
+    for r in 0..rows {
+        for c in 0..cols.saturating_sub(2) {
+            score += eval_window(&cells[r][c], &cells[r][c+1], &cells[r][c+2]);
+        }
+    }
+
+    // this is the vertical windows (columns)
+    for r in 0..rows.saturating_sub(2) {
+        for c in 0..cols {
+            score += eval_window(&cells[r][c], &cells[r+1][c], &cells[r+2][c]);
+        }
+    }
+
+    // this is for diagonal windows, from the top left to the bottom right
+    for r in 0..rows.saturating_sub(2) {
+        for c in 0..cols.saturating_sub(2) {
+            score += eval_window(&cells[r][c], &cells[r+1][c+1], &cells[r+2][c+2]);
+        }
+    }
+
+    // this is the reverse diagonal windows, from top right to bottom left
+    for r in 0..rows.saturating_sub(2) {
+        for c in 2..cols {
+            score += eval_window(&cells[r][c], &cells[r+1][c-1], &cells[r+2][c-2]);
+        }
+    }
+
+    // Says the score
+    score
 }
 
 fn minmax_depth(board: &mut Board, player: Player, depth: u32, max_depth:u32) -> (i32, usize, usize){
