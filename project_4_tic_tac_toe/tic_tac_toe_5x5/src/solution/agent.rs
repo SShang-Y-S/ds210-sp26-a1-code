@@ -14,6 +14,7 @@ fn heuristic(board: &mut Board) -> i32{
     let cells = board.get_cells();
     let rows = cells.len();
     let cols = cells[0].len();
+
     let mut score: i32 = 0;
 
     // helper: this scores a single 3 cell window
@@ -22,14 +23,15 @@ fn heuristic(board: &mut Board) -> i32{
         let window = [a, b, c];
         let mut x_count = 0;
         let mut o_count = 0;
+        let mut empty_count = 0;
         let mut wall = false;
 
         for cell in window.iter() {
             match cell {
                 Cell::X => x_count += 1,
                 Cell::O => o_count += 1,
+                Cell::Empty => empty_count +=1,
                 Cell::Wall => wall = true,
-                Cell::Empty => {}
             }
         }
 
@@ -38,13 +40,15 @@ fn heuristic(board: &mut Board) -> i32{
             return 0;
         }
 
-        match (x_count, o_count) {
-            (3, 0) => 100,
-            (2, 0) => 10,
-            (1, 0) => 1,
-            (0, 3) => -100,
-            (0, 2) => -10,
-            (0, 1) => -1,
+        match (x_count, o_count, empty_count) {
+            (3, 0, 0) => 10000,
+            (2, 0, 1) => 700,
+            (1, 0, 2) => 10,
+
+            (0, 3, 0) => -10000,
+            (0, 2, 1) => -550,
+            (0, 1, 2) => -8,
+
             _ => 0,
         }
     };
@@ -77,51 +81,23 @@ fn heuristic(board: &mut Board) -> i32{
         }
     }
 
+    if rows == 5 {
+        match cells[2][2]{
+            Cell::X => score += 30,
+            Cell::O => score -= 30,
+            _ => {}
+        }
+    }
+
     // Says the score
     score
 }
-// fn immediate_move(board: &mut Board, player: Player) -> Option<(usize, usize)>{
-//     let moves = board.moves();
-    
-//     for m in moves.iter(){
-//         board.apply_move(*m, player);
-//         let score = board.score();
-//         board.undo_move(*m, player);
-
-//         match player{
-//             Player::X => {
-//                 if score > 0 {
-//                     return Some(*m);
-//                 }
-//             }
-//             Player::O => {
-//                 if score < 0{
-//                     return Some(*m);
-//                 }
-//             }
-//         }
-//     }
-//     let opponent = player.flip();
-//     for m in moves.iter(){
-//         board.apply_move(*m, player);
-//         let score = board.score();
-//         board.undo_move(*m, player);
-
-//         match opponent {
-//             Player::X => {
-//                 if score > 0 {
-//                     return Some(*m);
-//                 }
-//             }
-//             Player::O => {
-//                 if score < 0{
-//                     return Some(*m);
-//                 }
-//             }
-//         }
-//     }
-//     return None;
-// }
+fn immediate_move(board: &mut Board, player: Player) -> Option<(usize, usize)>{
+    let moves = board.moves();
+    todo!("make the move in prediction of the enemy move");
+    //somethings needs to be added here depending on our ranking
+   
+}
 
 fn minmax_depth(board: &mut Board, player: Player, depth: u32, max_depth: u32, mut alpha: i32, mut beta: i32) -> (i32, usize, usize){
     if board.game_over(){
@@ -138,6 +114,7 @@ fn minmax_depth(board: &mut Board, player: Player, depth: u32, max_depth: u32, m
             match player{
                 Player::X => {
                     let mut best_score = i32::MIN;
+
                     for m in moves{
                         board.apply_move(m, player);
                         let (score, _, _) = minmax_depth(board, player.flip(), depth+1, max_depth, alpha, beta);
@@ -190,17 +167,30 @@ impl Agent for SolutionAgent {
     // and <x>, <y> are the position of the move your solution will make.
 
     fn solve(board: &mut Board, player: Player, _time_limit: u64) -> (i32, usize, usize) {
-        // if let Some(m) = immediate_move(board, player){
-        //     return (board.score(), m.0, m.1)
-        // }
+        let size = board.get_cells().len();
+        let moves_left = board.moves().len();
 
-        let max_depth: u32 = 4;
-        // if board.get_cells().len() == 3{
-        //     max_depth = board.moves().len() as u32;
-        // }
-        // else{
-        //     max_depth = 4;
-        // }
+        if size == 3{
+            let max_depth = moves_left as u32;
+            return minmax_depth(board, player, 0, max_depth, i32::MIN, i32::MAX);
+
+        }
+        let max_depth = if player == Player::O{
+            if moves_left > 16 {
+                5
+            }
+            else {
+                6
+            }
+        }
+        else {
+            if moves_left > 16{
+                4
+            }
+            else{
+                5
+            }
+        };
         return minmax_depth(board, player, 0, max_depth, i32::MIN, i32::MAX);
     }
 }
