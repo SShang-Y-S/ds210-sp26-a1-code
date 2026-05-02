@@ -140,20 +140,11 @@ fn minmax_depth(board: &mut Board, player: Player, depth: u32, max_depth: u32, m
 
     let mut moves: Vec<(usize, usize)> = board.moves();
 
-    // moves.sort_by(|a, b|{
-    //     board.apply_move(*a, player);
-    //     let score_a = heuristic(board);
-    //     board.undo_move(*a, player);
-
-    //     board.apply_move(*b, player);
-    //     let score_b = heuristic(board);
-    //     board.undo_move(*b, player);
-
-    //     match player{
-    //         Player::X => score_b.cmp(&score_a),
-    //         Player::O => score_a.cmp(&score_b),
-    //     }
-    // });
+    moves.sort_by_key(|m|{
+        let (r, c) = *m;
+        let center = (2,2);
+        if (r, c) == center { 0 } else { 1 }
+    });
 
     let mut best_move = moves[0];
 
