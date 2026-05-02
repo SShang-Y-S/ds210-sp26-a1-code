@@ -42,12 +42,12 @@ fn heuristic(board: &mut Board) -> i32{
 
         match (x_count, o_count, empty_count) {
             (3, 0, 0) => 10000,
-            (2, 0, 1) => 700,
-            (1, 0, 2) => 10,
+            (2, 0, 1) => 900,
+            (1, 0, 2) => 20,
 
             (0, 3, 0) => -10000,
-            (0, 2, 1) => -550,
-            (0, 1, 2) => -8,
+            (0, 2, 1) => -700,
+            (0, 1, 2) => -15,
 
             _ => 0,
         }
@@ -93,8 +93,38 @@ fn heuristic(board: &mut Board) -> i32{
     score
 }
 fn immediate_move(board: &mut Board, player: Player) -> Option<(usize, usize)>{
+    let before = board.score();
     let moves = board.moves();
-    todo!("make the move in prediction of the enemy move");
+    
+    for m in moves.iter(){
+        board.apply_move(*m, player);
+        let after = board.score();
+        board.undo_move(*m, player);
+
+        if player == Player::X && after > before {
+            return Some(*m);
+        }
+        if player == Player::O && after < before {
+            return Some(*m);
+        }
+    }
+
+    let opponent = player.flip();
+
+    for m in moves.iter(){
+        board.apply_move(*m, opponent);
+        let after = board.score();
+        board.undo_move(*m, opponent);
+
+        if opponent == Player::X && after > before {
+            return Some(*m);
+        }
+        if opponent == Player::O && after < before {
+            return Some(*m);
+        }
+    }
+
+    return None;
     //somethings needs to be added here depending on our ranking
    
 }
@@ -104,11 +134,27 @@ fn minmax_depth(board: &mut Board, player: Player, depth: u32, max_depth: u32, m
         return (board.score(), 0, 0)
     }
 
-    if depth == max_depth{
+    if depth >= max_depth{
         return (heuristic(board), 0, 0);
     }
 
-    let moves: Vec<(usize, usize)> = board.moves();
+    let mut moves: Vec<(usize, usize)> = board.moves();
+
+    // moves.sort_by(|a, b|{
+    //     board.apply_move(*a, player);
+    //     let score_a = heuristic(board);
+    //     board.undo_move(*a, player);
+
+    //     board.apply_move(*b, player);
+    //     let score_b = heuristic(board);
+    //     board.undo_move(*b, player);
+
+    //     match player{
+    //         Player::X => score_b.cmp(&score_a),
+    //         Player::O => score_a.cmp(&score_b),
+    //     }
+    // });
+
     let mut best_move = moves[0];
 
             match player{
@@ -175,20 +221,33 @@ impl Agent for SolutionAgent {
             return minmax_depth(board, player, 0, max_depth, i32::MIN, i32::MAX);
 
         }
+        if size != 3 {
+            if let Some(m) = immediate_move(board, player){
+                return (board.score(), m.0, m.1);
+            }
+        }
+
+
         let max_depth = if player == Player::O{
-            if moves_left > 16 {
+            if moves_left > 18 {
+                4
+            }
+            else if moves_left > 10{
                 5
             }
-            else {
+            else{
                 6
             }
         }
         else {
-            if moves_left > 16{
+            if moves_left > 18 {
                 4
             }
-            else{
+            else if moves_left > 10 {
                 5
+            }
+            else{
+                6
             }
         };
         return minmax_depth(board, player, 0, max_depth, i32::MIN, i32::MAX);
